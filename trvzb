@@ -1,0 +1,113 @@
+blueprint:
+  name: 🧠 Sonoff TRVZB – Synchronizace externí teploty (bez přepínání external2)
+  description: >
+    Tento blueprint automaticky synchronizuje teplotu z externího senzoru
+    (např. Ecowitt, Aqara, Shelly, apod.) do hlavice Sonoff TRVZB.
+
+    🔧 Zajišťuje, že hlavice vždy používá režim **external** (a ne external2/3).
+    🔄 Spouští se při změně teploty nebo každou hodinu.
+    ⚙️ Filtruje malé změny teploty (např. < 0.2 °C), aby se hlavice zbytečně
+    nezatěžovala.
+    🚨 Ošetřuje stavy `unknown` a `unavailable`.
+
+  domain: automation
+
+  input:
+    external_temperature_sensor:
+      name: 🌡️ Externí teplotní senzor
+      description: Entita senzoru teploty (např. Ecowitt, Aqara, Shelly...)
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              device_class: temperature
+
+    trv_external_temperature_input:
+      name: 🔧 Hlavice Sonoff TRVZB – externí teplota
+      description: Entita čísla (`number.sonoff_trvzb_external_temperature_input`)
+      selector:
+        entity:
+          multiple: true
+          filter:
+            - domain: number
+              device_class: temperature
+
+    trv_temperature_sensor_select:
+      name: 🧭 Výběr senzoru teploty (select)
+      description: Entita typu `select`, např. `select.trv_kuchyne_zigbee_temperature_sensor_select`
+      selector:
+        entity:
+          filter:
+            - domain: select
+
+    temperature_change_threshold:
+      name: 🔺 Minimální změna teploty pro aktualizaci
+      description: |
+        Hodnota změny (v °C), po jejímž překročení se teplota odešle do TRV.
+        Nastavte 0 pro okamžité aktualizace bez filtru.
+      default: 0.2
+      selector:
+        number:
+          min: 0
+          max: 2
+          step: 0.1
+          mode: slider
+          unit_of_measurement: °C
+
+mode: single
+
+triggers:
+  - trigger: state
+    entity_id: !input external_temperature_sensor
+  - trigger: time_pattern
+    hours: /1
+
+variables:
+  external_temperature_sensor: !input external_temperature_sensor
+  trv_external_temperature_input: !input trv_external_temperature_input
+  select_entity: !input trv_temperature_sensor_select
+  threshold: !input temperature_change_threshold
+
+conditions:
+  - condition: template
+    value_template: >
+      {{ states(external_temperature_sensor) not in ['unknown', 'unavailable', None, 'none'] }}
+
+actions:
+  # 🧭 Zkontroluj, zda hlavice používá "external"
+  - choose:
+      - conditions: >
+          {{ states(select_entity) != 'external' }}
+        sequence:
+          - action: select.select_option
+            data:
+              entity_id: "{{ select_entity }}"
+              option: "external"
+          - delay: "00:00:02"
+
+  # 🌡️ Nastavení teploty do hlavice, pokud se změnila o více než threshold
+  - repeat:
+      for_each: !input trv_external_temperature_input
+      sequence:
+        - variables:
+            trv_entity: "{{ repeat.item }}"
+            current_value: "{{ states(trv_entity) | float(0) }}"
+            new_value: "{{ states(external_temperature_sensor) | float(0) }}"
+        - condition: template
+          value_template: >
+            {% set new = states(external_temperature_sensor) | float(0) %}
+            {% set cur = states(trv_entity) | float(0) %}
+            {{ threshold == 0 or ((new - cur) | abs > threshold) }}
+        - delay: "00:00:02"
+        - action: number.set_value
+          data:
+            value: "{{ new_value }}"
+            entity_id: "{{ trv_entity }}"
+          alias: "Nastavit externí teplotu do TRVZB"
+
+  # 🪶 (volitelné) Záznam do logu / notifikace
+  - action: system_log.write
+    data:
+      message: >
+        [TRVZB Sync] Aktualizováno: {{ external_temperature_sensor }} = {{ states(external_temperature_sensor) }} °C → {{ trv_external_temperature_input }} (režim: {{ states(select_entity) }})
+      level: info
