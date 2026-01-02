@@ -1,5 +1,5 @@
 blueprint:
-  name: 🧠 Sonoff TRVZB – Synchronizace externí teploty (bez přepínání external2)
+  name: Sonoff TRVZB – Synchronizace externí teploty
   description: >
     Tento blueprint automaticky synchronizuje teplotu z externího senzoru
     (např. Ecowitt, Aqara, Shelly, apod.) do hlavice Sonoff TRVZB.
