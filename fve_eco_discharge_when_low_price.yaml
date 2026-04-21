@@ -3,7 +3,7 @@
 # Created: 2026-04-21
 # ------------------------------------------------------------------------------
 blueprint:
-  name: Eco Discharge When Low Price at Noon
+  name: FVE - Eco Discharge When Low Price at Noon 1
   description: Checks conditions at specified time (PV prediction, energy prices) and sets eco discharge mode in the morning (moves the overflows from the afternoon to the morning) by script, then sets general mode again when price is low enough
   domain: automation
   input:
