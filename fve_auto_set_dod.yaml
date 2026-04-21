@@ -3,7 +3,7 @@
 # Created: 2025-02-24
 # ------------------------------------------------------------------------------
 blueprint:
-  name: Auto Set DoD
+  name: [FVE] Auto Set Depth of Discharge
   description: Automatically changes battery DoD depending on today's forecast
   domain: automation
   input:
@@ -61,6 +61,13 @@ blueprint:
           filter:
             domain: sensor
             integration: goodwe
+    season:
+      name: Season Sensor
+      description: Sensor which indicates current season (Winter, Spring, Summer, Autumn)
+      selector:
+        entity:
+          filter:
+            domain: sensor
 
 triggers:
   - trigger: time
@@ -70,7 +77,7 @@ conditions:
     entity_id: !input production_forecast 
     above: !input threshold_for_changing_dod
   - condition: state
-    entity_id: input_select.season
+    entity_id: sensor.season
     state: Winter
 variables:
   winter_dod: !input winter_dod
