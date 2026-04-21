@@ -21,13 +21,11 @@ blueprint:
         target:
           entity:
             domain: number
-            integration: goodwe
+            #integration: goodwe
     limit_value_W:
       name: Export Limit Value (W)
       description: |
         Numeric value of the original export limit (W) which is set when the price is positive again
-        - set this value if your Export Limit entity uses WATTS
-        - value in % left unchanged
         - if you don't set this value even if your Export Limit entity uses Watts, default value is 5500 W
       default: 5500
       selector:
