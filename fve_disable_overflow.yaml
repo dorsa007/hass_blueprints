@@ -23,7 +23,7 @@ blueprint:
           entity:
             domain: number
             #integration: goodwe
-    limit_value_W:
+    export_limit_value:
       name: Export Limit Value (W)
       description: |
         Numeric value of the original export limit (W) which is set when the price is positive again
@@ -52,7 +52,7 @@ blueprint:
 variables:
   spot_price: !input spot_price
   goodwe_export_limit: !input goodwe_export_limit
-  limit_W: !input limit_value_W
+  export_limit_value: !input export_limit_value
   spot_price_export_limit: !input spot_price_export_limit
 triggers:
 - trigger: numeric_state
@@ -72,5 +72,5 @@ actions:
     target: !input goodwe_export_limit
     data:
       value_template: >-
-        {{ value_W }}
+        {{ export_limit_value }}
 mode: single
