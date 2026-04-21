@@ -3,7 +3,7 @@
 # Created: 2026-04-21
 # ------------------------------------------------------------------------------
 blueprint:
-  name: FVE - Disable Overflow 5
+  name: FVE - Disable Overflow 6
   description: 'Disables overflow when eletricity price is negative (Export Limit is set to 0). When the spot price is positive again, script sets Export Limit back to entered Value.'
   domain: automation
   input:
@@ -68,12 +68,9 @@ actions:
     value: 0
 - sequence:
   - wait_template: '{{ states(spot_price) | float(default=0) > spot_price_export_limit | float(default=0) }}'
-    timeout: '00:30:00'
-    continue_on_timeout: false
   #- action: number.set_value
   - action: input_number.set_value
     target: !input goodwe_export_limit
     data:
-      value: >-
-        {{ export_limit_value }}
+      value: "{{ export_limit_value }}"
 mode: single
