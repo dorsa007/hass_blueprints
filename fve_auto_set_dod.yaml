@@ -3,7 +3,7 @@
 # Created: 2025-02-24
 # ------------------------------------------------------------------------------
 blueprint:
-  name: [FVE] Auto Set Depth of Discharge
+  name: \[FVE\] Auto Set Depth of Discharge
   description: Automatically changes battery DoD depending on today's forecast
   domain: automation
   input:
