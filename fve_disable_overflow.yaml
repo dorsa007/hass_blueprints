@@ -37,31 +37,28 @@ blueprint:
           step: 100
           unit_of_measurement: 'W'
           mode: slider
-    limit_value_percentage:
-      name: Export Limit Value (%)
+    spot_price_export_limit:
+      name: Spot Price Export Limit (Kc/MWh)
       description: |
-        Numeric value of the original export limit (%) which is set when the price is positive again
-        - set this value if your Export Limit entity uses PERCENTAGE
-        - value in Watts left unchanged
-        - if you don't set this value even if your Export Limit entity uses percentage, default value is 100 %
-      default: 100
+        Spot price threshold (in Kc/MWh) for setting export limit to 0
+      default: 0
       selector:
         number:
           min: 0
-          max: 100
+          max: 1000
           step: 1
-          unit_of_measurement: '%'
-          mode: slider
+          unit_of_measurement: 'Kc/MWh'
+          mode: box
 
 variables:
   spot_price: !input spot_price
   goodwe_export_limit: !input goodwe_export_limit
   limit_W: !input limit_value_W
-  limit_per: !input limit_value_percentage
+  spot_price_export_limit: !input spot_price_export_limit
 triggers:
 - trigger: numeric_state
   entity_id: !input spot_price
-  below: 0
+  below: !input spot_price_export_limit
 conditions: []
 actions:
 - action: number.set_value
@@ -69,16 +66,10 @@ actions:
   data:
     value: 0
 - sequence:
-  - wait_template: '{{ states(spot_price) | float(default=0) > 0 }}'
+  - wait_template: '{{ states(spot_price) | float(default=0) > spot_price_export_limit }}'
   - action: number.set_value
     target: !input goodwe_export_limit
     data:
       value_template: >-
-        {% set entity_id = goodwe_export_limit.entity_id %} {% set unit = state_attr(entity_id, 'unit_of_measurement') %} {% set value_W = limit_W %} {% set value_per = limit_per %} {% if unit == 'W' %}
-          {{ value_W }}
-        {% elif unit == '%' %}
-          {{ value_per }}
-        {% else %}
-          {{ none }}
-        {% endif %}
+        {{ value_W }}
 mode: single
