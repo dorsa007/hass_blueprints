@@ -67,7 +67,7 @@ actions:
   data:
     value: 0
 - sequence:
-  - wait_template: '{{ states(spot_price) | float(default=0) > states(spot_price_export_limit) | float(default=0) }}'
+  - wait_template: '{{ states(spot_price) | float(default=0) > spot_price_export_limit | float(default=0) }}'
     timeout: '00:30:00'
     continue_on_timeout: false
   #- action: number.set_value
