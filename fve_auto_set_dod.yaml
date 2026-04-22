@@ -77,7 +77,7 @@ conditions:
     entity_id: !input production_forecast 
     above: !input threshold_for_changing_dod
   - condition: state
-    entity_id: sensor.season
+    entity_id: !input season
     state: Winter
 variables:
   winter_dod: !input winter_dod
