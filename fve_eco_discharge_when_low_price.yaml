@@ -3,7 +3,7 @@
 # Created: 2026-04-21
 # ------------------------------------------------------------------------------
 blueprint:
-  name: FVE - Eco Discharge When Low Price at Noon 5
+  name: FVE - Eco Discharge When Low Price at Noon 6
   description: Checks conditions at specified time (PV prediction, energy prices) and sets eco discharge mode in the morning (moves the overflows from the afternoon to the morning) by script, then sets general mode again when price is low enough
   domain: automation
   input:
@@ -135,7 +135,7 @@ triggers:
 conditions:
 - condition: template
   value_template: >-
-    {% set prediction = states(prediction) | float(default=0) %} {% set avg_daily_consumption = states(avg_daily_consumption) / 1000 | float(default=0) %} {% set capacity = states(capacity) | float(default=0) %} {% set actual_soc = states(soc) | float(default=0) %} {{ prediction > 0.7*avg_daily_consumption + (100-actual_soc)/100*capacity }}
+    {% set prediction = states(prediction) | float(default=0) %} {% set avg_daily_consumption = states(avg_daily_consumption) | float(default=0) %} {% set capacity = states(capacity) | float(default=0) %} {% set actual_soc = states(soc) | float(default=0) %} {{ prediction > 0.7*avg_daily_consumption/1000 + (100-actual_soc)/100*capacity }}
 - condition: template
   value_template: >-
     {% set intervals = [(9, 12),(12, 15),] %} {% set min = namespace(price=[], mor=[], aft=[]) %}
