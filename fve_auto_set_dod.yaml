@@ -78,7 +78,7 @@ conditions:
     above: !input threshold_for_changing_dod
   - condition: state
     entity_id: !input season
-    state: Winter
+    state: winter
 variables:
   winter_dod: !input winter_dod
   actual_soc: !input goodwe_actual_soc
