@@ -78,16 +78,18 @@ blueprint:
       selector:
         target:
           entity:
-            domain: number
-            integration: goodwe
+            #domain: number
+            #integration: goodwe
+            domain: input_number
     goodwe_mode:
       name: GoodWe Inverter Mode
       description: Target entity describing mode of the inverter
       selector:
         target:
           entity:
-            domain: select
-            integration: goodwe
+            #domain: select
+            #integration: goodwe
+            domain: input_select
     goodwe_actual_soc:
       name: GoodWe SoC Sensor
       description: GoodWe actual state of charge sensor
@@ -95,7 +97,7 @@ blueprint:
         entity:
           filter:
             domain: sensor
-            integration: goodwe
+            #integration: goodwe
 
 variables:
   prediction: !input production_forecast
