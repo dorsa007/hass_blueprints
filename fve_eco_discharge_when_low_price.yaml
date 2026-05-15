@@ -3,7 +3,7 @@
 # Created: 2026-04-21
 # ------------------------------------------------------------------------------
 blueprint:
-  name: FVE - Eco Discharge When Low Price at Noon 6
+  name: FVE - Eco Discharge When Low Price at Noon 1
   description: Checks conditions at specified time (PV prediction, energy prices) and sets eco discharge mode in the morning (moves the overflows from the afternoon to the morning) by script, then sets general mode again when price is low enough
   domain: automation
   input:
@@ -72,7 +72,7 @@ blueprint:
         entity:
           filter:
             domain: input_number
-    goodwe_power:
+    goodwe_discharge_power:
       name: GoodWe Discharging Power
       description: Target entity describing power of discharging in eco discharge mode
       selector:
@@ -181,24 +181,26 @@ conditions:
     {% else %}
       {{ price_morning > (-1) * price_afternoon }}
     {% endif %}
-- condition: state
-  entity_id: !input season
-  #state: Spring/Autumn     # OR must be added to the template for Sprng/Autumn selection
-  state: spring
+- condition: or
+  conditions:
+  - condition: state
+    entity_id: !input season
+    state: spring
+  - condition: state
+    entity_id: !input season
+    state: autumn
 actions:
 - sequence:
   - wait_template: >-
       {% set production = states(avg_20_production) | float(default=0) %} {% set consumption = states(avg_20_consumption) | float(default=0) %} {% set soc = states(soc) | float(default=0) %} {{ production > 2 * consumption and soc > 25 }}
     timeout: 04:00:00
     continue_on_timeout: false
-  #- action: number.set_value
-  - action: input_number.set_value
-    target: !input goodwe_power
+  - action: number.set_value
+    target: !input goodwe_discharge_power
     data:
       value: 1
   - delay: 00:00:05
-  #- action: select.select_option
-  - action: input_select.select_option
+  - action: select.select_option
     target: !input goodwe_mode
     data:
       option: eco_discharge
@@ -207,15 +209,13 @@ actions:
         {% set estimated_minutes = remaining_hours_to_charge * 60 %} {% set stop_time = as_timestamp(now()) + estimated_minutes %} {% set formatted_stop_time = stop_time | timestamp_custom('%H:%M', true, default='23:59:00') %} {% set now = as_timestamp(now()) | timestamp_custom('%H:%M', true) %} {% set is_cheapest_block = states(is_cheapest) %} {% set actual_spot_price = states(spot_price) | float(default=0) %} {{ (estimated_minutes >= 0 and formatted_stop_time > '16:00' and now > '11:00') or is_cheapest_block == 'on' or actual_spot_price < 0.1 }}
       timeout: 03:00:00
       continue_on_timeout: false
-    #- action: select.select_option
-    - action: input_select.select_option
+    - action: select.select_option
       target: !input goodwe_mode
       data:
         option: general
     - delay: 00:00:05
-    #- action: number.set_value
-    - action: input_number.set_value
-      target: !input goodwe_power
+    - action: number.set_value
+      target: !input goodwe_discharge_power
       data:
         value: 0
 mode: single
