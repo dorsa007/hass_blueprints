@@ -3,7 +3,7 @@
 # Created: 2026-04-21
 # ------------------------------------------------------------------------------
 blueprint:
-  name: FVE - Eco Discharge When Low Price at Noon 1
+  name: FVE - Eco Discharge When Low Price at Noon 2
   description: Checks conditions at specified time (PV prediction, energy prices) and sets eco discharge mode in the morning (moves the overflows from the afternoon to the morning) by script, then sets general mode again when price is low enough
   domain: automation
   input:
@@ -78,18 +78,16 @@ blueprint:
       selector:
         target:
           entity:
-            #domain: number
-            #integration: goodwe
-            domain: input_number
+            domain: number
+            integration: goodwe
     goodwe_mode:
       name: GoodWe Inverter Mode
       description: Target entity describing mode of the inverter
       selector:
         target:
           entity:
-            #domain: select
-            #integration: goodwe
-            domain: input_select
+            domain: select
+            integration: goodwe
     goodwe_actual_soc:
       name: GoodWe SoC Sensor
       description: GoodWe actual state of charge sensor
@@ -97,7 +95,7 @@ blueprint:
         entity:
           filter:
             domain: sensor
-            #integration: goodwe
+            integration: goodwe
     season:
       name: Season Sensor
       description: Sensor which indicates current season (Winter, Spring, Summer, Autumn)
