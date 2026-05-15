@@ -3,7 +3,7 @@
 # Created: 2026-04-21
 # ------------------------------------------------------------------------------
 blueprint:
-  name: Turn Off Eco Discharge Mode When Peak
+  name: FVE - Turn Off Eco Discharge Mode When Peak 1
   description: "Turns off eco discharge mode when consumption is bigger than production"
   domain: automation
   input:
