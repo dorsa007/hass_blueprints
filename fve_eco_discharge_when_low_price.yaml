@@ -196,7 +196,7 @@ actions:
   - action: number.set_value
     target: !input goodwe_discharge_power
     data:
-      value: 1
+      value: 5
   - delay: 00:00:05
   - action: select.select_option
     target: !input goodwe_mode
